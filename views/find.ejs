@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>학교 찾기</title>
+  </head>
+  <body>
+    <h1>학교 찾기</h1>
+    <span id="loading">검색중...</span>
+    <ul id="list"></ul>
+
+    <script type="text/javascript">
+      const ul = document.getElementById("list");
+      const param = location.search.substr(location.search.indexOf("?q="));
+
+      fetch("https://schoolmenukr.ml/code/api" + param)
+        .then((response) => response.json())
+        .then((json) => {
+          for (const [index, school] of json.school_infos.entries()) {
+            if (school.address.substring(0, 3) == "경기도") {
+              let li = document.createElement("li");
+              li.innerHTML = `<span id="${index}.code">${school.code}</span> | <a href="#" id="${index}" onclick="sendData(this);">${school.name}</a>`;
+              ul.appendChild(li);
+            }
+          }
+          if (json.school_infos.length == 0) {
+            document.getElementById("loading").innerHTML = "검색 결과가 없습니다."
+          } else {
+            document.getElementById("loading").style.display = "none";
+          }
+        });
+
+      function sendData(obj) {
+        opener.document.getElementById("schulNm").value = obj.innerHTML;
+        opener.document.getElementById("schulCode").value = document.getElementById(
+          obj.id + ".code"
+        ).innerHTML;
+        window.close();
+      }
+    </script>
+  </body>
+</html>
