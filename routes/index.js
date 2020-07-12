@@ -3,6 +3,7 @@ var admin = require("firebase-admin");
 var fetch = require("node-fetch");
 var querystring = require("querystring");
 var router = express.Router();
+var ejs = require("ejs");
 
 var serviceAccount = require("../serviceAccountKey.json");
 
@@ -99,7 +100,9 @@ function sendResult(qstnCrtfcNoEncpt, schulNm, stdntName) {
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("index", { title: "Express" });
+  ejs.renderFile("./views/index.ejs").then((content) => {
+    res.render("template", { content });
+  });
 });
 
 router.get("/find", function (req, res, next) {
