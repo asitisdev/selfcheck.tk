@@ -1,0 +1,11 @@
+#schulCode {
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
+  box-shadow: none;
+  color: #7a7a7a;
+  pointer-events: none;
+}
+
+#title {
+    word-break: keep-all;
+}

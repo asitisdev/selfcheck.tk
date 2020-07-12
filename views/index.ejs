@@ -5,55 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>경기도교육청 자가진단 자동화 서비스</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css" />
-    <style>
-      #schulCode {
-        background-color: #f5f5f5;
-        border-color: #f5f5f5;
-        box-shadow: none;
-        color: #7a7a7a;
-        pointer-events: none;
-      }
-    </style>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
   <body>
     <section class="hero is-primary">
       <div style="text-align: center;" class="hero-body">
-        <h1 class="title">경기도교육청 학생 건강상태 자가진단 자동화</h1>
-        <h2 class="subtitle">매일 새벽 3시에 자가진단을 자동으로 진행합니다!</h2>
+        <h1 id="title" class="title"><a style="color: white" href="/">경기도교육청 학생 건강상태 자가진단 자동화</a></h1>
+        <h2 class="subtitle is-6">매일 새벽 3시에 자가진단을 자동으로 진행합니다!</h2>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
-        <form action="./add" method="POST">
-          <div class="columns is-centered">
-            <div class="column is-two-thirds">
-              <div class="box">
-                <div class="content">
-                  <h2 class="title is-5">이 사이트는 무엇인가요?</h2>
-                  <p>
-                    경기도교육청의 학생 건강상태 자가진단을 자동으로 완료해주는 서비스입니다.
-                    사용자의 정보를 사이트에 등록해두면 매일 새벽 3시에 자동으로 자가진단이
-                    완료됩니다!
-                  </p>
-                  <h2 class="title is-5">이 서비스가 왜 필요하죠?</h2>
-                  <p>
-                    건강에 이상이 없는 대부분의 친구들이 매일 아침 자가진단을 하느라 시간을 낭비하는
-                    모습을 보고 모두의 시간을 절약해주기 위해 제작하였습니다.
-                  </p>
-                  <h2 class="title is-5">건강에 이상이 있을 경우에는 어떻게 하나요?</h2>
-                  <p>
-                    이 서비스는 매일 새벽 3시에 자동으로 자가진단을 진행합니다. 만약 건강에 이상이
-                    있으시다면 새벽 3시 이후에 직접 건강상태를 확인하고 자가진단을 해주세요.
-                    자동으로 진행된 자가진단 결과를 덮어쓰고 저장합니다.
-                  </p>
-                  <h2 class="title is-5">궁금한 점이 있어요!</h2>
-                  <p>
-                    개발자 메일(hando1220@naver.com)으로 연락해주세요!
-                  </p>
-                </div>
+        <div class="columns is-centered">
+          <div class="column is-two-thirds">
+            <div class="box">
+              <div class="content">
+                <h2 class="title is-5">이 사이트는 무엇인가요?</h2>
+                <p>
+                  경기도교육청의 학생 건강상태 자가진단을 자동으로 완료해주는 서비스입니다. 사용자의
+                  정보를 사이트에 등록해두면 매일 새벽 3시에 자동으로 자가진단이 완료됩니다!
+                </p>
+                <h2 class="title is-5">이 서비스가 왜 필요하죠?</h2>
+                <p>
+                  건강에 이상이 없는 대부분의 친구들이 매일 아침 자가진단을 하느라 시간을 낭비하는
+                  모습을 보고 모두의 시간을 절약해주기 위해 제작하였습니다.
+                </p>
+                <h2 class="title is-5">건강에 이상이 있을 경우에는 어떻게 하나요?</h2>
+                <p>
+                  이 서비스는 매일 새벽 3시에 자동으로 자가진단을 진행합니다. 만약 건강에 이상이
+                  있으시다면 새벽 3시 이후에 직접 건강상태를 확인하고 자가진단을 해주세요. 자동으로
+                  진행된 자가진단 결과를 덮어쓰고 저장합니다.
+                </p>
+                <h2 class="title is-5">궁금한 점이 있어요!</h2>
+                <p>
+                  개발자 메일(hando1220@naver.com)으로 연락해주세요!
+                </p>
               </div>
+            </div>
 
+            <form action="./add" method="POST">
               <div class="box">
                 <div class="field">
                   <label class="label" for="schulNm">학교명</label>
@@ -117,9 +108,9 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </section>
 
