@@ -53,51 +53,6 @@ function getQstnCrtfcNoEncpt(schulCode, pName, frnoRidno) {
     });
 }
 
-// 자가진단 실시
-function sendResult(qstnCrtfcNoEncpt, schulNm, stdntName) {
-  return fetch(
-    "https://eduro.goe.go.kr/stv_cvd_co01_000.do?" +
-      // "https://eduro.goe.go.kr/stv_cvd_co02_000.do?" +
-      querystring.stringify({
-        rtnRsltCode: "SUCCESS",
-        qstnCrtfcNoEncpt: qstnCrtfcNoEncpt,
-        schulNm: schulNm,
-        stdntName: stdntName,
-        rspns01: 1,
-        rspns02: 1,
-        rspns07: 0,
-        rspns08: 0,
-        rspns09: 0,
-      }),
-    {
-      method: "POST",
-      body: {
-        rtnRsltCode: "SUCCESS",
-        qstnCrtfcNoEncpt: qstnCrtfcNoEncpt,
-        schulNm: schulNm,
-        stdntName: stdntName,
-        rspns01: 1,
-        rspns02: 1,
-        rspns07: 0,
-        rspns08: 0,
-        rspns09: 0,
-      },
-    }
-  )
-    .then((response) => response.json())
-    .then((json) => {
-      if (json.resultSVO.rtnRsltCode == "SUCCESS") {
-        return "SUCCESS - " + stdntName + " | " + qstnCrtfcNoEncpt;
-      } else {
-        return undefined;
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      return undefined;
-    });
-}
-
 /* GET home page. */
 router.get("/", function (req, res, next) {
   ejs.renderFile("./views/index.ejs").then((content) => {
