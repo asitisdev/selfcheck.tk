@@ -117,45 +117,34 @@ router.post("/add", function (req, res, next) {
       req.body.birth
     );
 
-    if (qstnCrtfcNoEncpt) {
-      let data = {
-        birth: req.body.birth,
-        name: req.body.name,
-        schulNm: req.body.schulNm,
-        schulCode: req.body.schulCode,
-        qstnCrtfcNoEncpt,
-      };
-      console.log(data);
+    let list = db.collection("list");
 
-      let list = db
-        .collection("list")
-        .add(data)
-        .then((ref) => console.log("Added document with ID: ", ref.id));
-      res.render("add");
+    if (qstnCrtfcNoEncpt) {
+      list
+        .where("qstnCrtfcNoEncpt", "==", qstnCrtfcNoEncpt)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.empty) {
+            let data = {
+              birth: req.body.birth,
+              name: req.body.name,
+              schulNm: req.body.schulNm,
+              schulCode: req.body.schulCode,
+              qstnCrtfcNoEncpt,
+            };
+
+            list.add(data).then((ref) => console.log("Added document with ID: ", ref.id));
+            res.render("add");
+
+            console.log(data);
+          } else {
+            res.redirect("/error");
+          }
+        });
     } else {
       res.redirect("/error");
     }
   })();
-});
-
-router.get("/run", function (req, res, next) {
-  db.collection("list")
-    .get()
-    .then((snapshot) => {
-      console.log("The size of list :", snapshot.size);
-      snapshot.forEach((doc) => {
-        console.log(doc.id, ": ", doc.data());
-        let data = doc.data();
-        (async () => {
-          console.log(await sendResult(data.qstnCrtfcNoEncpt, data.schulNm, data.name));
-        })();
-      });
-      res.redirect("/");
-    })
-    .catch((err) => {
-      console.log("ERROR! ", err);
-      res.redirect("/error");
-    });
 });
 
 module.exports = router;
