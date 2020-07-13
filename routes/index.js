@@ -134,7 +134,9 @@ router.post("/add", function (req, res, next) {
             };
 
             list.add(data).then((ref) => console.log("Added document with ID: ", ref.id));
-            res.render("add");
+            ejs.renderFile("./views/success.ejs").then((content) => {
+              res.render("template", { content });
+            });
 
             console.log(data);
           } else {
