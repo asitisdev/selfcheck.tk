@@ -5,19 +5,37 @@ var querystring = require("querystring");
 var router = express.Router();
 var ejs = require("ejs");
 
-var serviceAccount = require("../serviceAccountKey.json");
+const URL = {
+  B: "https://eduro.sen.go.kr",  // 서울
+  J: "https://eduro.goe.go.kr",  // 경기
+  G: "https://eduro.dje.go.kr",  // 대전
+  D: "https://eduro.dge.go.kr",  // 대구
+  C: "https://eduro.pen.go.kr",  // 부산
+  E: "https://eduro.ice.go.kr",  // 인천
+  F: "https://eduro.gen.go.kr",  // 광주
+  H: "https://eduro.use.go.kr",  // 울산
+  I: "https://eduro.sje.go.kr",  // 세종
+  M: "https://eduro.cbe.go.kr",  // 충북
+  N: "https://eduro.cne.go.kr",  // 충남
+  R: "https://eduro.gbe.kr",     // 경북
+  S: "https://eduro.gne.go.kr",  // 경남
+  K: "https://eduro.kwe.go.kr",  // 강원
+  P: "https://eduro.jbe.go.kr",  // 전북
+  Q: "https://eduro.jne.go.kr",  // 전남
+  T: "https://eduro.jje.go.kr"   // 제주
+}
 
-var defaultApp = admin.initializeApp({
+const serviceAccount = require("../serviceAccountKey.json");
+const defaultApp = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://selfcheck-19.firebaseio.com",
 });
-
-var db = defaultApp.firestore();
+const db = defaultApp.firestore();
 
 // 사용자 정보 검증
 function getQstnCrtfcNoEncpt(schulCode, pName, frnoRidno) {
   return fetch(
-    "https://eduro.goe.go.kr/stv_cvd_co00_012.do?" +
+    URL[schulCode.charAt(0)] + "/stv_cvd_co00_012.do?" +
       querystring.stringify({
         schulCode: schulCode,
         pName: pName,

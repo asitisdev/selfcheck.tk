@@ -14,11 +14,11 @@
             <input class="input" type="text" name="q" placeholder="학교 이름" value="<%= q %>" />
           </div>
           <div class="control">
-            <input class="button" type="submit" value="찾기"/>
+            <input class="button" type="submit" value="찾기" />
           </div>
         </div>
       </form>
-      <hr>
+      <hr />
       <span id="loading">검색중...</span>
       <ul id="list"></ul>
     </section>
@@ -31,11 +31,9 @@
         .then((response) => response.json())
         .then((json) => {
           for (const [index, school] of json.school_infos.entries()) {
-            if (school.address.substring(0, 3) == "경기도") {
-              let li = document.createElement("li");
-              li.innerHTML = `<span id="${index}.code">${school.code}</span> | <a href="#" id="${index}" onclick="sendData(this);">${school.name}</a>`;
-              ul.appendChild(li);
-            }
+            let li = document.createElement("li");
+            li.innerHTML = `<span id="${index}.code" style="display: none">${school.code}</span><a href="#" id="${index}" onclick="sendData(this);">${school.name}</a> | ${school.address}`;
+            ul.appendChild(li);
           }
           if (json.school_infos.length == 0) {
             document.getElementById("loading").innerHTML = "검색 결과가 없습니다.";
