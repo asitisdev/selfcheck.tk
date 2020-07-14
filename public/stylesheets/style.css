@@ -7,5 +7,13 @@
 }
 
 #title {
-    word-break: keep-all;
+  word-break: keep-all;
+}
+
+html {
+  background-color: #fafafa;
+}
+
+body {
+  background-color: #ffffff;
 }
