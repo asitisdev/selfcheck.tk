@@ -27,26 +27,13 @@
   <form action="./add" method="POST">
     <div class="field">
       <label class="label" for="schulNm">학교명</label>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              id="schulCode"
-              name="schulCode"
-              placeholder="학교 코드"
-              readonly
-            />
-          </div>
+      <input class="input" type="hidden" id="schulCode" name="schulCode" placeholder="학교 코드" />
+      <div class="field has-addons">
+        <div class="control is-expanded">
+          <input class="input" type="text" id="schulNm" name="schulNm" placeholder="학교 이름" />
         </div>
-        <div class="field has-addons">
-          <div class="control is-expanded">
-            <input class="input" type="text" id="schulNm" name="schulNm" placeholder="학교 이름" />
-          </div>
-          <div class="control">
-            <input class="button" type="button" value="학교 찾기" onclick="findSchool()" />
-          </div>
+        <div class="control">
+          <input class="button" type="button" value="학교 찾기" onclick="findSchool()" />
         </div>
       </div>
     </div>
