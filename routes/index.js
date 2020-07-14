@@ -108,4 +108,11 @@ router.post("/add", function (req, res, next) {
   })();
 });
 
+router.get("/test", function (req, res, next) {
+  let page = req.query.p || "index";
+  ejs.renderFile(`./views/${page}.ejs`).then((content) => {
+    res.render("template", { content });
+  });
+});
+
 module.exports = router;
