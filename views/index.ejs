@@ -27,13 +27,31 @@
   <form action="./add" method="POST">
     <div class="field">
       <label class="label" for="schulNm">학교명</label>
-      <input class="input" type="hidden" id="schulCode" name="schulCode" placeholder="학교 코드" />
+      <input
+        class="input"
+        type="hidden"
+        id="schulCode"
+        name="schulCode"
+        placeholder="학교 코드"
+        required
+      />
       <div class="field has-addons">
         <div class="control is-expanded">
-          <input class="input" type="text" id="schulNm" name="schulNm" placeholder="학교 이름" />
+          <input
+            class="input"
+            type="text"
+            id="schulNm"
+            name="schulNm"
+            placeholder="학교 이름"
+            oninvalid="this.setCustomValidity('학교 이름을 입력하신 후 학교 찾기를 해주세요!')"
+            oninput="this.setCustomValidity('')"
+            onkeydown="return false"
+            autocomplete="off"
+            required
+          />
         </div>
         <div class="control">
-          <input class="button" type="button" value="학교 찾기" onclick="findSchool()" />
+          <input class="button" id="find" type="button" value="학교 찾기" onclick="findSchool()" />
         </div>
       </div>
     </div>
@@ -41,7 +59,16 @@
     <div class="field">
       <label class="label" for="pName">이름</label>
       <div class="control">
-        <input class="input" type="text" id="name" name="name" placeholder="이름" />
+        <input
+          class="input"
+          type="text"
+          id="name"
+          name="name"
+          placeholder="이름"
+          oninvalid="this.setCustomValidity('이름을 입력해주세요!')"
+          oninput="this.setCustomValidity('')"
+          required
+        />
       </div>
     </div>
     <label class="label" for="birth">생년월일</label>
@@ -56,6 +83,9 @@
           id="birth"
           name="birth"
           placeholder="생년월일"
+          oninvalid="this.setCustomValidity('생년월일을 입력해주세요!')"
+          oninput="this.setCustomValidity('')"
+          required
         />
       </div>
       <p class="help">*주민등록번호 앞자리 6자리</p>
@@ -71,29 +101,23 @@
 </div>
 
 <script type="text/javascript">
-  document.addEventListener(
-    "keydown",
-    function (event) {
-      if (event.keyCode === 13) {
-        event.preventDefault();
-        findSchool();
-      }
-    },
-    true
-  );
+  let $schulCode = document.getElementById("schulCode");
+  let $schulNm = document.getElementById("schulNm");
+
+  $schulNm.addEventListener("focusout", function () {
+    if ($schulCode.value == "") {
+      findSchool();
+    }
+  });
 
   function setSchool(schulCode, schulNm) {
-    document.querySelector("#schulCode").value = schulCode;
-    document.querySelector("#schulNm").value = schulNm;
+    $schulCode.value = schulCode;
+    $schulNm.value = schulNm;
   }
 
   let openWin;
   function findSchool() {
     window.name = "parentForm";
-    openWin = window.open(
-      "./find?q=" + document.getElementById("schulNm").value,
-      "childForm",
-      "width=570,height=350"
-    );
+    openWin = window.open("./find?q=" + $schulNm.value, "childForm", "width=570,height=350");
   }
 </script>
