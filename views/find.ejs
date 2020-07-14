@@ -4,11 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>학교 찾기</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css" />
   </head>
   <body>
-    <h1>학교 찾기</h1>
-    <span id="loading">검색중...</span>
-    <ul id="list"></ul>
+    <section class="section">
+      <form method="GET">
+        <div class="field has-addons">
+          <div class="control is-expanded">
+            <input class="input" type="text" name="q" placeholder="학교 이름" />
+          </div>
+          <div class="control">
+            <input class="button" type="submit" value="찾기"/>
+          </div>
+        </div>
+      </form>
+      <hr>
+      <span id="loading">검색중...</span>
+      <ul id="list"></ul>
+    </section>
 
     <script type="text/javascript">
       const ul = document.getElementById("list");
@@ -25,7 +38,7 @@
             }
           }
           if (json.school_infos.length == 0) {
-            document.getElementById("loading").innerHTML = "검색 결과가 없습니다."
+            document.getElementById("loading").innerHTML = "검색 결과가 없습니다.";
           } else {
             document.getElementById("loading").style.display = "none";
           }
