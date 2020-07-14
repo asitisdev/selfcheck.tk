@@ -61,7 +61,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/find", function (req, res, next) {
-  res.render("find");
+  res.render("find", { q: req.query.q });
 });
 
 router.post("/add", function (req, res, next) {
