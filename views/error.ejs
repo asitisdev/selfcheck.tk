@@ -3,31 +3,3 @@
   <h2 class="title is-5"><%= error.status %></h2>
   <pre><%= error.stack %></pre>
 </div>
-
-<script type="text/javascript">
-  document.addEventListener(
-    "keydown",
-    function (event) {
-      if (event.keyCode === 13) {
-        event.preventDefault();
-        findSchool();
-      }
-    },
-    true
-  );
-
-  function setSchool(schulCode, schulNm) {
-    document.querySelector("#schulCode").value = schulCode;
-    document.querySelector("#schulNm").value = schulNm;
-  }
-
-  let openWin;
-  function findSchool() {
-    window.name = "parentForm";
-    openWin = window.open(
-      "./find?q=" + document.getElementById("schulNm").value,
-      "childForm",
-      "width=570,height=350"
-    );
-  }
-</script>
