@@ -95,11 +95,15 @@ router.post("/add", function (req, res, next) {
 
             console.log(data);
           } else {
-            res.redirect("/error");
+            ejs.renderFile("./views/conflict.ejs").then((content) => {
+              res.render("template", { content });
+            });
           }
         });
     } else {
-      res.redirect("/error");
+      ejs.renderFile("./views/fail.ejs").then((content) => {
+        res.render("template", { content });
+      });
     }
   })();
 });
