@@ -89,6 +89,7 @@ function run(req, res) {
           global.log += "\n" + await sendResult(data.qstnCrtfcNoEncpt, data.schulNm, data.name, data.schulCode);
         })();
       });
+      console.log("Done!");
       res.send(global.log);
     })
     .catch((err) => {
