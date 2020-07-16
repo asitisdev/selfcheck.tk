@@ -33,7 +33,7 @@ var defaultApp = admin.initializeApp({
 var db = defaultApp.firestore();
 
 // 자가진단 실시
-function sendResult(qstnCrtfcNoEncpt, schulNm, stdntName) {
+function sendResult(qstnCrtfcNoEncpt, schulNm, stdntName, schulCode) {
   return fetch(
     URL[schulCode.charAt(0)] + "/stv_cvd_co01_000.do?" +
       querystring.stringify({
@@ -86,7 +86,7 @@ function run(req, res) {
         global.log += `\n${doc.id}`;
         let data = doc.data();
         (async () => {
-          global.log += "\n" + await sendResult(data.qstnCrtfcNoEncpt, data.schulNm, data.name);
+          global.log += "\n" + await sendResult(data.qstnCrtfcNoEncpt, data.schulNm, data.name, data.schulCode);
         })();
       });
       res.send(global.log);
