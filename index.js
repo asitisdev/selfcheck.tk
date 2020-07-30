@@ -65,6 +65,7 @@ function sendResult(qstnCrtfcNoEncpt, schulNm, stdntName, schulCode) {
     .then((response) => response.json())
     .then((json) => {
       if (json.resultSVO.rtnRsltCode == "SUCCESS") {
+        global.log += "\nSUCCESS - " + stdntName + " | " + qstnCrtfcNoEncpt;
         return "SUCCESS - " + stdntName + " | " + qstnCrtfcNoEncpt;
       } else {
         return undefined;
@@ -79,17 +80,14 @@ function sendResult(qstnCrtfcNoEncpt, schulNm, stdntName, schulCode) {
 function run(req, res) {
   db.collection("list")
     .get()
-    .then((snapshot) => {
+    .then(async (snapshot) => {
       global.log = `The size of list : ${snapshot.size}`;
-      snapshot.forEach((doc) => {
-        // global.log += `\n${doc.id}: ${doc.data()}`;
-        global.log += `\n${doc.id}`;
-        let data = doc.data();
-        (async () => {
-          global.log += "\n" + await sendResult(data.qstnCrtfcNoEncpt, data.schulNm, data.name, data.schulCode);
-        })();
-      });
-      console.log("Done!");
+      await Promise.all(
+        snapshot.docs.map((doc) => {
+          let data = doc.data();
+          return sendResult(data.qstnCrtfcNoEncpt, data.schulNm, data.name, data.schulCode);
+        })
+      );
       res.send(global.log);
     })
     .catch((err) => {
