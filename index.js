@@ -1,4 +1,4 @@
-// Google Cloud Function 사용 index.js, serviceAccountKey.json, package.json 업로드
+// Google Cloud Function 사용(Node12 Beta) index.js, serviceAccountKey.json, package.json 업로드
 var admin = require("firebase-admin");
 var fetch = require("node-fetch");
 var querystring = require("querystring");
@@ -82,7 +82,7 @@ function run(req, res) {
     .get()
     .then(async (snapshot) => {
       global.log = `The size of list : ${snapshot.size}`;
-      await Promise.all(
+      await Promise.allSettled(
         snapshot.docs.map((doc) => {
           let data = doc.data();
           return sendResult(data.qstnCrtfcNoEncpt, data.schulNm, data.name, data.schulCode);
