@@ -1,6 +1,6 @@
 {
   "name": "selfcheck",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
@@ -14,7 +14,7 @@
     "firebase-admin": "^8.13.0",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "query-string": "^6.13.1"
   }
 }
