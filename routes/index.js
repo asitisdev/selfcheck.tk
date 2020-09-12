@@ -1,9 +1,9 @@
-var express = require("express");
-var admin = require("firebase-admin");
-var fetch = require("node-fetch");
-var crypto = require("crypto");
-var router = express.Router();
-var ejs = require("ejs");
+const express = require("express");
+const admin = require("firebase-admin");
+const fetch = require("node-fetch");
+const crypto = require("crypto");
+const router = express.Router();
+const ejs = require("ejs");
 
 const serviceAccount = require("../serviceAccountKey.json");
 const defaultApp = admin.initializeApp({
