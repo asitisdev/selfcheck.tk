@@ -18,7 +18,7 @@ with open(CSV_FILE, "r") as file:
     for row in reader:
         print(f"{row['name']} | {row['birth']}")
         data = {
-            "schulCode": SCHUL_CODE,
+            "orgCode": SCHUL_CODE,
             "schulNm": SCHUL_NM,
             "name": row["name"],
             "birth": row["birth"],

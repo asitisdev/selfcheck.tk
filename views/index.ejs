@@ -3,7 +3,7 @@
     <h2 class="title is-5">이 사이트는 무엇인가요?</h2>
     <p>
       학생 건강상태 자가진단을 자동으로 완료해주는 서비스입니다. 사용자의 정보를 사이트에 등록해두면
-      매일 새벽 3시에 자동으로 자가진단이 완료됩니다!
+      매일 새벽 1시에 자동으로 자가진단이 완료됩니다!
     </p>
     <h2 class="title is-5">이 서비스가 왜 필요하죠?</h2>
     <p>
@@ -12,26 +12,24 @@
     </p>
     <h2 class="title is-5">건강에 이상이 있을 경우에는 어떻게 하나요?</h2>
     <p>
-      이 서비스는 매일 새벽 3시에 자동으로 자가진단을 진행합니다. 만약 건강에 이상이 있으시다면 새벽
-      3시 이후에 직접 건강상태를 확인하고 자가진단을 해주세요. 자동으로 진행된 자가진단 결과를
+      이 서비스는 매일 새벽 1시에 자동으로 자가진단을 진행합니다. 만약 건강에 이상이 있으시다면 새벽
+      1시 이후에 직접 건강상태를 확인하고 자가진단을 해주세요. 자동으로 진행된 자가진단 결과를
       덮어쓰고 저장합니다.
     </p>
     <h2 class="title is-5">궁금한 점이 있어요!</h2>
-    <p>
-      문의사항은 개발자 메일(hando1220@naver.com)으로 연락해주세요!
-    </p>
+    <p>문의사항은 개발자 메일(hando1220@naver.com)으로 연락해주세요!</p>
   </div>
 </div>
 
 <div class="box">
   <form action="./add" method="POST">
     <div class="field">
-      <label class="label" for="schulNm">학교명</label>
+      <label class="label" for="orgName">학교명</label>
       <input
         class="input"
         type="hidden"
-        id="schulCode"
-        name="schulCode"
+        id="orgCode"
+        name="orgCode"
         placeholder="학교 코드"
         required
       />
@@ -40,13 +38,12 @@
           <input
             class="input"
             type="text"
-            id="schulNm"
-            name="schulNm"
+            id="orgName"
+            name="orgName"
             placeholder="학교 이름"
+            onchange="findSchool()"
             oninvalid="this.setCustomValidity('학교 이름을 입력하신 후 학교 찾기를 해주세요!')"
             oninput="this.setCustomValidity('')"
-            onkeydown="return false"
-            autocomplete="off"
             required
           />
         </div>
@@ -78,17 +75,37 @@
           class="input"
           type="text"
           maxlength="6"
-          pattern="[0-9]*"
+          pattern="[0-9]{6}"
           inputmode="numeric"
-          id="birth"
-          name="birth"
+          id="birthday"
+          name="birthday"
           placeholder="생년월일"
-          oninvalid="this.setCustomValidity('생년월일을 입력해주세요!')"
+          oninvalid="this.setCustomValidity('생년월일 6자리를 입력해주세요!')"
           oninput="this.setCustomValidity('')"
           required
         />
       </div>
       <p class="help">*주민등록번호 앞자리 6자리</p>
+    </div>
+    <label class="label" for="birth">자가진단 비밀번호</label>
+    <div class="field">
+      <div class="control is-expanded">
+        <input
+          class="input"
+          type="text"
+          maxlength="6"
+          pattern="[0-9]{4}"
+          inputmode="numeric"
+          id="password"
+          name="password"
+          placeholder="비밀번호"
+          oninvalid="this.setCustomValidity('숫자 4자리 비밀번호를 입력해주세요!')"
+          oninput="this.setCustomValidity('')"
+          autocomplete="off"
+          required
+        />
+      </div>
+      <p class="help">*비밀번호 숫자 4자리를 자가진단 사이트에서 등록해주세요.</p>
     </div>
     <div class="field">
       <div class="control">
@@ -101,23 +118,17 @@
 </div>
 
 <script type="text/javascript">
-  let $schulCode = document.getElementById("schulCode");
-  let $schulNm = document.getElementById("schulNm");
+  let $orgCode = document.getElementById("orgCode");
+  let $orgName = document.getElementById("orgName");
 
-  $schulNm.addEventListener("focusout", function () {
-    if ($schulCode.value == "") {
-      findSchool();
-    }
-  });
-
-  function setSchool(schulCode, schulNm) {
-    $schulCode.value = schulCode;
-    $schulNm.value = schulNm;
+  function setSchool(orgCode, orgName) {
+    $orgCode.value = orgCode;
+    $orgName.value = orgName;
   }
 
   let openWin;
   function findSchool() {
     window.name = "parentForm";
-    openWin = window.open("./find?q=" + $schulNm.value, "childForm", "width=570,height=350");
+    openWin = window.open("./find?q=" + $orgName.value, "childForm", "width=570,height=350");
   }
 </script>

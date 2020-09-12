@@ -43,8 +43,8 @@
         });
 
       function sendData(obj) {
-        opener.document.getElementById("schulNm").value = obj.innerHTML;
-        opener.document.getElementById("schulCode").value = document.getElementById(
+        opener.document.getElementById("orgName").value = obj.innerHTML;
+        opener.document.getElementById("orgCode").value = document.getElementById(
           obj.id + ".code"
         ).innerHTML;
         window.close();

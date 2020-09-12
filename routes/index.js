@@ -1,29 +1,9 @@
 var express = require("express");
 var admin = require("firebase-admin");
 var fetch = require("node-fetch");
-var querystring = require("querystring");
+var crypto = require("crypto");
 var router = express.Router();
 var ejs = require("ejs");
-
-const URL = {
-  B: "https://eduro.sen.go.kr",  // 서울
-  J: "https://eduro.goe.go.kr",  // 경기
-  G: "https://eduro.dje.go.kr",  // 대전
-  D: "https://eduro.dge.go.kr",  // 대구
-  C: "https://eduro.pen.go.kr",  // 부산
-  E: "https://eduro.ice.go.kr",  // 인천
-  F: "https://eduro.gen.go.kr",  // 광주
-  H: "https://eduro.use.go.kr",  // 울산
-  I: "https://eduro.sje.go.kr",  // 세종
-  M: "https://eduro.cbe.go.kr",  // 충북
-  N: "https://eduro.cne.go.kr",  // 충남
-  R: "https://eduro.gbe.kr",     // 경북
-  S: "https://eduro.gne.go.kr",  // 경남
-  K: "https://eduro.kwe.go.kr",  // 강원
-  P: "https://eduro.jbe.go.kr",  // 전북
-  Q: "https://eduro.jne.go.kr",  // 전남
-  T: "https://eduro.jje.go.kr"   // 제주
-}
 
 const serviceAccount = require("../serviceAccountKey.json");
 const defaultApp = admin.initializeApp({
@@ -32,39 +12,107 @@ const defaultApp = admin.initializeApp({
 });
 const db = defaultApp.firestore();
 
-// 사용자 정보 검증
-function getQstnCrtfcNoEncpt(schulCode, pName, frnoRidno) {
-  return fetch(
-    URL[schulCode.charAt(0)] + "/stv_cvd_co00_012.do?" +
-      querystring.stringify({
-        schulCode: schulCode,
-        pName: pName,
-        frnoRidno: frnoRidno,
-      }),
-    {
-      method: "POST",
-      body: {
-        schulCode: schulCode,
-        pName: pName,
-        frnoRidno: frnoRidno,
-      },
-    }
-  )
-    .then((response) => {
-      if (response) {
-        return response.json();
+const KEY =
+  "-----BEGIN PUBLIC KEY-----\n" +
+  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA81dCnCKt0NVH7j5Oh2+S\n" +
+  "GgEU0aqi5u6sYXemouJWXOlZO3jqDsHYM1qfEjVvCOmeoMNFXYSXdNhflU7mjWP8\n" +
+  "jWUmkYIQ8o3FGqMzsMTNxr+bAp0cULWu9eYmycjJwWIxxB7vUwvpEUNicgW7v5nC\n" +
+  "wmF5HS33Hmn7yDzcfjfBs99K5xJEppHG0qc+q3YXxxPpwZNIRFn0Wtxt0Muh1U8a\n" +
+  "vvWyw03uQ/wMBnzhwUC8T4G5NclLEWzOQExbQ4oDlZBv8BM/WxxuOyu0I8bDUDdu\n" +
+  "tJOfREYRZBlazFHvRKNNQQD2qDfjRz484uFs7b5nykjaMB9k/EJAuHjJzGs9MMMW\n" +
+  "tQIDAQAB\n" +
+  "-----END PUBLIC KEY-----";
+
+const HEADER = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36",
+  "Content-Type": "application/json",
+  "Cache-Control": "no-cache",
+  "Connection": "keep-alive",
+  "Accept": "*/*",
+};
+
+// RSA PKCS1 암호화
+function encrypt(original) {
+  return crypto
+    .publicEncrypt(
+      { key: KEY, padding: crypto.constants.RSA_PKCS1_PADDING },
+      Buffer.from(original, "utf8")
+    )
+    .toString("base64");
+}
+
+// 사용자 정보 확인
+function validateUser(orgCode, name, birthday, password) {
+  return fetch("https://goehcs.eduro.go.kr/loginwithschool", {
+    method: "POST",
+    body: JSON.stringify({
+      orgcode: orgCode,
+      name: encrypt(name),
+      birthday: encrypt(birthday),
+    }),
+    headers: HEADER,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.isError == true) {
+        throw new Error("User Information Error");
       } else {
-        return undefined;
+        return data.token;
       }
     })
-    .then((json) => {
-      if (json.resultSVO.rtnRsltCode == "SUCCESS") {
-        console.log("SUCCESS");
-        return json.resultSVO.qstnCrtfcNoEncpt;
+    .then((token) =>
+      fetch("https://goehcs.eduro.go.kr/secondlogin", {
+        method: "POST",
+        body: JSON.stringify({
+          password: encrypt(password),
+          deviceUuid: "",
+        }),
+        headers: {
+          ...HEADER,
+          Authorization: token,
+        },
+      })
+    )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.isError == true) {
+        throw new Error("Password Error");
       } else {
-        return undefined;
+        return true;
       }
     })
+    .catch((error) => {
+      console.log(error);
+      return false;
+    });
+}
+
+// 사용자 정보 가져오기
+function getUserPNo(orgCode, name, birthday) {
+  return fetch("https://goehcs.eduro.go.kr/loginwithschool", {
+    method: "POST",
+    body: JSON.stringify({
+      orgcode: orgCode,
+      name: encrypt(name),
+      birthday: encrypt(birthday),
+    }),
+    headers: HEADER,
+  })
+    .then((response) => response.json())
+    .then((json) => json.token)
+    .then((token) =>
+      fetch("https://goehcs.eduro.go.kr/selectGroupList", {
+        method: "POST",
+        body: JSON.stringify({}),
+        headers: {
+          ...HEADER,
+          Authorization: token,
+        },
+      })
+    )
+    .then((response) => response.json())
+    .then((json) => json.groupList[0].userPNo)
     .catch((error) => {
       console.log(error);
       return undefined;
@@ -82,36 +130,31 @@ router.get("/find", function (req, res, next) {
   res.render("find", { q: req.query.q });
 });
 
-router.post("/add", function (req, res, next) {
-  (async () => {
-    let qstnCrtfcNoEncpt = await getQstnCrtfcNoEncpt(
-      req.body.schulCode,
-      req.body.name,
-      req.body.birth
-    );
-
-    let list = db.collection("list");
-
-    if (qstnCrtfcNoEncpt) {
-      list
-        .where("qstnCrtfcNoEncpt", "==", qstnCrtfcNoEncpt)
+router.post("/add", async function (req, res, next) {
+  if (await validateUser(req.body.orgCode, req.body.name, req.body.birthday, req.body.password)) {
+    const userPNo = await getUserPNo(req.body.orgCode, req.body.name, req.body.birthday);
+    const students = db.collection("students");
+    if (userPNo) {
+      students
+        .where("userPNo", "==", userPNo)
         .get()
         .then((snapshot) => {
           if (snapshot.empty) {
             let data = {
-              birth: req.body.birth,
               name: req.body.name,
-              schulNm: req.body.schulNm,
-              schulCode: req.body.schulCode,
-              qstnCrtfcNoEncpt,
+              birthday: req.body.birthday,
+              orgName: req.body.orgName,
+              orgCode: req.body.orgCode,
+              password: req.body.password,
+              userPNo,
             };
 
-            list.add(data).then((ref) => console.log("Added document with ID: ", ref.id));
+            students.add(data).then((ref) => console.log("Added document with ID: ", ref.id));
+            console.log(data);
+
             ejs.renderFile("./views/success.ejs").then((content) => {
               res.render("template", { content });
             });
-
-            console.log(data);
           } else {
             ejs.renderFile("./views/conflict.ejs").then((content) => {
               res.render("template", { content });
@@ -123,7 +166,11 @@ router.post("/add", function (req, res, next) {
         res.render("template", { content });
       });
     }
-  })();
+  } else {
+    ejs.renderFile("./views/fail.ejs").then((content) => {
+      res.render("template", { content });
+    });
+  }
 });
 
 router.get("/test", function (req, res, next) {
