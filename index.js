@@ -1,91 +1,110 @@
 // Google Cloud Function 사용(Node12 Beta) index.js, serviceAccountKey.json, package.json 업로드
-var admin = require("firebase-admin");
-var fetch = require("node-fetch");
-var querystring = require("querystring");
+const admin = require("firebase-admin");
+const fetch = require("node-fetch");
+const crypto = require("crypto");
 
-var URL = {
-  B: "https://eduro.sen.go.kr",  // 서울
-  J: "https://eduro.goe.go.kr",  // 경기
-  G: "https://eduro.dje.go.kr",  // 대전
-  D: "https://eduro.dge.go.kr",  // 대구
-  C: "https://eduro.pen.go.kr",  // 부산
-  E: "https://eduro.ice.go.kr",  // 인천
-  F: "https://eduro.gen.go.kr",  // 광주
-  H: "https://eduro.use.go.kr",  // 울산
-  I: "https://eduro.sje.go.kr",  // 세종
-  M: "https://eduro.cbe.go.kr",  // 충북
-  N: "https://eduro.cne.go.kr",  // 충남
-  R: "https://eduro.gbe.kr",     // 경북
-  S: "https://eduro.gne.go.kr",  // 경남
-  K: "https://eduro.kwe.go.kr",  // 강원
-  P: "https://eduro.jbe.go.kr",  // 전북
-  Q: "https://eduro.jne.go.kr",  // 전남
-  T: "https://eduro.jje.go.kr"   // 제주
-}
-
-var serviceAccount = require("./serviceAccountKey.json");
-
-var defaultApp = admin.initializeApp({
+const serviceAccount = require("./serviceAccountKey.json");
+const defaultApp = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://selfcheck-19.firebaseio.com",
 });
+const db = defaultApp.firestore();
 
-var db = defaultApp.firestore();
+const KEY =
+  "-----BEGIN PUBLIC KEY-----\n" +
+  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA81dCnCKt0NVH7j5Oh2+S\n" +
+  "GgEU0aqi5u6sYXemouJWXOlZO3jqDsHYM1qfEjVvCOmeoMNFXYSXdNhflU7mjWP8\n" +
+  "jWUmkYIQ8o3FGqMzsMTNxr+bAp0cULWu9eYmycjJwWIxxB7vUwvpEUNicgW7v5nC\n" +
+  "wmF5HS33Hmn7yDzcfjfBs99K5xJEppHG0qc+q3YXxxPpwZNIRFn0Wtxt0Muh1U8a\n" +
+  "vvWyw03uQ/wMBnzhwUC8T4G5NclLEWzOQExbQ4oDlZBv8BM/WxxuOyu0I8bDUDdu\n" +
+  "tJOfREYRZBlazFHvRKNNQQD2qDfjRz484uFs7b5nykjaMB9k/EJAuHjJzGs9MMMW\n" +
+  "tQIDAQAB\n" +
+  "-----END PUBLIC KEY-----";
+
+const HEADER = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36",
+  "Content-Type": "application/json",
+  "Cache-Control": "no-cache",
+  "Connection": "keep-alive",
+  "Accept": "*/*",
+};
+
+// RSA PKCS1 암호화
+function encrypt(original) {
+  return crypto
+    .publicEncrypt(
+      { key: KEY, padding: crypto.constants.RSA_PKCS1_PADDING },
+      Buffer.from(original, "utf8")
+    )
+    .toString("base64");
+}
 
 // 자가진단 실시
-function sendResult(qstnCrtfcNoEncpt, schulNm, stdntName, schulCode) {
-  return fetch(
-    URL[schulCode.charAt(0)] + "/stv_cvd_co01_000.do?" +
-      querystring.stringify({
-        rtnRsltCode: "SUCCESS",
-        qstnCrtfcNoEncpt: qstnCrtfcNoEncpt,
-        schulNm: schulNm,
-        stdntName: stdntName,
-        rspns01: 1,
-        rspns02: 1,
-        rspns07: 0,
-        rspns08: 0,
-        rspns09: 0,
-      }),
-    {
-      method: "POST",
-      body: {
-        rtnRsltCode: "SUCCESS",
-        qstnCrtfcNoEncpt: qstnCrtfcNoEncpt,
-        schulNm: schulNm,
-        stdntName: stdntName,
-        rspns01: 1,
-        rspns02: 1,
-        rspns07: 0,
-        rspns08: 0,
-        rspns09: 0,
-      },
-    }
-  )
+function sendResult(orgCode, name, birthday) {
+  return fetch("https://goehcs.eduro.go.kr/loginwithschool", {
+    method: "POST",
+    body: JSON.stringify({
+      orgcode: orgCode,
+      name: encrypt(name),
+      birthday: encrypt(birthday),
+    }),
+    headers: HEADER,
+  })
     .then((response) => response.json())
-    .then((json) => {
-      if (json.resultSVO.rtnRsltCode == "SUCCESS") {
-        global.log += "\nSUCCESS - " + stdntName + " | " + qstnCrtfcNoEncpt;
-        return "SUCCESS - " + stdntName + " | " + qstnCrtfcNoEncpt;
+    .then((data) => {
+      if (data.isError == true) {
+        throw new Error("User Information Error");
       } else {
-        return undefined;
+        return data.token;
       }
     })
+    .then((token) =>
+      fetch("https://goehcs.eduro.go.kr/registerServey", {
+        // 설문 제출
+        method: "POST",
+        body: JSON.stringify({
+          rspns01: "1",
+          rspns02: "1",
+          rspns03: null,
+          rspns04: null,
+          rspns05: null,
+          rspns06: null,
+          rspns07: "0",
+          rspns08: "0",
+          rspns09: "0",
+          rspns10: null,
+          rspns11: null,
+          rspns12: null,
+          rspns13: null,
+          rspns14: null,
+          rspns15: null,
+          rspns00: "Y",
+          deviceUuid: "",
+        }),
+        headers: {
+          ...HEADER,
+          Authorization: token,
+        },
+      })
+    )
+    .then((response) => response.json())
+    .then((json) => console.log(`${json.registerDtm} ${name} 자가진단 완료`))
     .catch((error) => {
       console.log(error);
-      return undefined;
+      return false;
     });
 }
 
 function run(req, res) {
-  db.collection("list")
+  db.collection("students")
     .get()
     .then(async (snapshot) => {
       global.log = `The size of list : ${snapshot.size}`;
       await Promise.allSettled(
         snapshot.docs.map((doc) => {
-          let data = doc.data();
-          return sendResult(data.qstnCrtfcNoEncpt, data.schulNm, data.name, data.schulCode);
+          const data = doc.data();
+          return sendResult(data.orgCode, data.name, data.birthday);
         })
       );
       res.send(global.log);
