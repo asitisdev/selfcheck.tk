@@ -130,6 +130,12 @@ router.get("/find", function (req, res, next) {
   res.render("find", { q: req.query.q });
 });
 
+router.get("/privacy", function (req, res, next) {
+  ejs.renderFile("./views/privacy.ejs").then((content) => {
+    res.render("template", { content });
+  });
+});
+
 router.post("/add", async function (req, res, next) {
   if (await validateUser(req.body.orgCode, req.body.name, req.body.birthday, req.body.password)) {
     const userPNo = await getUserPNo(req.body.orgCode, req.body.name, req.body.birthday);

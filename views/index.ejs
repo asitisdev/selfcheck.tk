@@ -2,8 +2,8 @@
   <div class="content">
     <h2 class="title is-5">이 사이트는 무엇인가요?</h2>
     <p>
-      학생 건강상태 자가진단을 자동으로 완료해주는 서비스입니다. 사용자의 정보를 사이트에 등록해두면
-      매일 새벽 1시에 자동으로 자가진단이 완료됩니다!
+      본 사이트는 학생 건강상태 자가진단을 자동으로 완료해주는 서비스를 제공합니다. 사용자의 정보를
+      사이트에 등록해두면 매일 새벽 1시에 자동으로 자가진단이 완료됩니다!
     </p>
     <h2 class="title is-5">이 서비스가 왜 필요하죠?</h2>
     <p>
@@ -12,9 +12,12 @@
     </p>
     <h2 class="title is-5">건강에 이상이 있을 경우에는 어떻게 하나요?</h2>
     <p>
-      이 서비스는 매일 새벽 1시에 자동으로 자가진단을 진행합니다. 만약 건강에 이상이 있으시다면 새벽
-      1시 이후에 직접 건강상태를 확인하고 자가진단을 해주세요. 자동으로 진행된 자가진단 결과를
-      덮어쓰고 저장합니다.
+      이 서비스는 매일 새벽 1시에 자동으로 자가진단을 진행합니다.
+      <b>
+        만약 건강에 이상이 있으시다면 반드시 새벽 1시 이후에 직접 건강상태를 확인하고 자가진단을
+        해주세요.
+      </b>
+      자동으로 진행된 자가진단 결과를 덮어쓰고 저장합니다.
     </p>
     <h2 class="title is-5">궁금한 점이 있어요!</h2>
     <p>문의사항은 개발자 메일(hando1220@naver.com)으로 연락해주세요!</p>
@@ -107,6 +110,21 @@
       </div>
       <p class="help">*비밀번호 숫자 4자리를 자가진단 사이트에서 등록해주세요.</p>
     </div>
+
+    <div class="field">
+      <div class="control">
+        <label class="checkbox">
+          <input
+            type="checkbox"
+            oninvalid="this.setCustomValidity('서비스를 이용하시려면 개인정보취급방침에 동의하셔야 합니다')"
+            oninput="this.setCustomValidity('')"
+            required
+          />
+          <a href="./privacy" target="blank_">개인정보취급방침 및 개인정보3자제공</a>에 동의합니다
+        </label>
+      </div>
+    </div>
+
     <div class="field">
       <div class="control">
         <div class="buttons is-right">
