@@ -42,18 +42,22 @@ function encrypt(original) {
 
 // 자가진단 실시
 function sendResult(orgCode, name, birthday) {
-  return fetch("https://goehcs.eduro.go.kr/loginwithschool", {
+  return fetch("https://goehcs.eduro.go.kr/v2/findUser", {
     method: "POST",
     body: JSON.stringify({
-      orgcode: orgCode,
-      name: encrypt(name),
+      loginType: "school",
+      orgCode: orgCode,
       birthday: encrypt(birthday),
+      name: encrypt(name),
+      stdntPNo: null
     }),
     headers: HEADER,
   })
     .then((response) => response.json())
     .then((data) => {
       if (data.isError == true) {
+        console.log(data)
+        console.log(name, birthday, orgCode)
         throw new Error("User Information Error");
       } else {
         return data.token;
@@ -64,14 +68,16 @@ function sendResult(orgCode, name, birthday) {
         // 설문 제출
         method: "POST",
         body: JSON.stringify({
+          deviceUuid: "",
+          rspns00: "Y",
           rspns01: "1",
           rspns02: "1",
           rspns03: null,
           rspns04: null,
           rspns05: null,
           rspns06: null,
-          rspns07: "0",
-          rspns08: "0",
+          rspns07: null,
+          rspns08: null,
           rspns09: "0",
           rspns10: null,
           rspns11: null,
@@ -79,8 +85,8 @@ function sendResult(orgCode, name, birthday) {
           rspns13: null,
           rspns14: null,
           rspns15: null,
-          rspns00: "Y",
-          deviceUuid: "",
+          upperToken: token,
+          upperUserNameEncpt: name
         }),
         headers: {
           ...HEADER,
