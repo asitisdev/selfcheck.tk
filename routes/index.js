@@ -44,25 +44,28 @@ function encrypt(original) {
 
 // 사용자 정보 확인
 function validateUser(orgCode, name, birthday, password) {
-  return fetch("https://goehcs.eduro.go.kr/loginwithschool", {
+  return fetch("https://goehcs.eduro.go.kr/v2/findUser", {
     method: "POST",
     body: JSON.stringify({
-      orgcode: orgCode,
-      name: encrypt(name),
+      loginType: "school",
+      orgCode: orgCode,
       birthday: encrypt(birthday),
+      name: encrypt(name),
+      stdntPNo: null,
     }),
     headers: HEADER,
   })
     .then((response) => response.json())
     .then((data) => {
       if (data.isError == true) {
+        console.log(data);
         throw new Error("User Information Error");
       } else {
         return data.token;
       }
     })
     .then((token) =>
-      fetch("https://goehcs.eduro.go.kr/secondlogin", {
+      fetch("https://goehcs.eduro.go.kr/v2/validatePassword", {
         method: "POST",
         body: JSON.stringify({
           password: encrypt(password),
@@ -90,19 +93,21 @@ function validateUser(orgCode, name, birthday, password) {
 
 // 사용자 정보 가져오기
 function getUserPNo(orgCode, name, birthday) {
-  return fetch("https://goehcs.eduro.go.kr/loginwithschool", {
+  return fetch("https://goehcs.eduro.go.kr/v2/findUser", {
     method: "POST",
     body: JSON.stringify({
-      orgcode: orgCode,
-      name: encrypt(name),
+      loginType: "school",
+      orgCode: orgCode,
       birthday: encrypt(birthday),
+      name: encrypt(name),
+      stdntPNo: null,
     }),
     headers: HEADER,
   })
     .then((response) => response.json())
     .then((json) => json.token)
     .then((token) =>
-      fetch("https://goehcs.eduro.go.kr/selectGroupList", {
+      fetch("https://goehcs.eduro.go.kr/v2/selectUserGroup", {
         method: "POST",
         body: JSON.stringify({}),
         headers: {
@@ -112,7 +117,7 @@ function getUserPNo(orgCode, name, birthday) {
       })
     )
     .then((response) => response.json())
-    .then((json) => json.groupList[0].userPNo)
+    .then((json) => json[0].userPNo)
     .catch((error) => {
       console.log(error);
       return undefined;
