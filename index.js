@@ -41,7 +41,7 @@ function encrypt(original) {
 }
 
 // 자가진단 실시
-function sendResult(orgCode, name, birthday) {
+function sendResult(orgCode, name, birthday, userPNo) {
   return fetch("https://goehcs.eduro.go.kr/v2/findUser", {
     method: "POST",
     body: JSON.stringify({
@@ -49,15 +49,38 @@ function sendResult(orgCode, name, birthday) {
       orgCode: orgCode,
       birthday: encrypt(birthday),
       name: encrypt(name),
-      stdntPNo: null
+      stdntPNo: null,
     }),
     headers: HEADER,
   })
     .then((response) => response.json())
     .then((data) => {
       if (data.isError == true) {
-        console.log(data)
-        console.log(name, birthday, orgCode)
+        console.log(data);
+        console.log(name, birthday, orgCode, userPNo);
+        throw new Error("User Information Error");
+      } else {
+        return data.token;
+      }
+    })
+    .then((token) =>
+      fetch("https://goehcs.eduro.go.kr/v2/getUserInfo", {
+        method: "POST",
+        body: JSON.stringify({
+          orgCode: orgCode,
+          userPNo: userPNo,
+        }),
+        headers: {
+          ...HEADER,
+          Authorization: token,
+        },
+      })
+    )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.isError == true) {
+        console.log(data);
+        console.log(name, birthday, orgCode, userPNo);
         throw new Error("User Information Error");
       } else {
         return data.token;
@@ -86,7 +109,7 @@ function sendResult(orgCode, name, birthday) {
           rspns14: null,
           rspns15: null,
           upperToken: token,
-          upperUserNameEncpt: name
+          upperUserNameEncpt: name,
         }),
         headers: {
           ...HEADER,
@@ -110,7 +133,7 @@ function run(req, res) {
       await Promise.allSettled(
         snapshot.docs.map((doc) => {
           const data = doc.data();
-          return sendResult(data.orgCode, data.name, data.birthday);
+          return sendResult(data.orgCode, data.name, data.birthday, data.userPNo);
         })
       );
       res.send(global.log);
