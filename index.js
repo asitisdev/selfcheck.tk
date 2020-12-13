@@ -41,7 +41,7 @@ function encrypt(original) {
 }
 
 // 자가진단 실시
-function sendResult(orgCode, name, birthday, userPNo) {
+function sendResult(orgCode, name, birthday, userPNo, password) {
   return fetch("https://goehcs.eduro.go.kr/v2/findUser", {
     method: "POST",
     body: JSON.stringify({
@@ -57,10 +57,33 @@ function sendResult(orgCode, name, birthday, userPNo) {
     .then((data) => {
       if (data.isError == true) {
         console.log(data);
-        console.log(name, birthday, orgCode, userPNo);
+        console.log(name, birthday, orgCode, userPNo, password);
         throw new Error("User Information Error");
       } else {
         return data.token;
+      }
+    })
+    .then((token) =>
+      fetch("https://goehcs.eduro.go.kr/v2/validatePassword", {
+        method: "POST",
+        body: JSON.stringify({
+          deviceUuid: "",
+          password: encrypt(password),
+        }),
+        headers: {
+          ...HEADER,
+          Authorization: token,
+        },
+      })
+    )
+    .then((response) => response.text())
+    .then((data) => {
+      const token = data.slice(1, -1);
+      if (token.startsWith("Bearer")) {
+        return token;
+      } else {
+        console.log(name, birthday, orgCode, userPNo, password);
+        throw new Error("Password Validation Error");
       }
     })
     .then((token) =>
@@ -80,7 +103,7 @@ function sendResult(orgCode, name, birthday, userPNo) {
     .then((data) => {
       if (data.isError == true) {
         console.log(data);
-        console.log(name, birthday, orgCode, userPNo);
+        console.log(name, birthday, orgCode, userPNo, password);
         throw new Error("User Information Error");
       } else {
         return data.token;
@@ -133,7 +156,7 @@ function run(req, res) {
       await Promise.allSettled(
         snapshot.docs.map((doc) => {
           const data = doc.data();
-          return sendResult(data.orgCode, data.name, data.birthday, data.userPNo);
+          return sendResult(data.orgCode, data.name, data.birthday, data.userPNo, data.password);
         })
       );
       res.send(global.log);
