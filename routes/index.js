@@ -92,7 +92,7 @@ function validateUser(orgCode, name, birthday, password) {
 }
 
 // 사용자 정보 가져오기
-function getUserPNo(orgCode, name, birthday) {
+function getUserPNo(orgCode, name, birthday, password) {
   return fetch("https://goehcs.eduro.go.kr/v2/findUser", {
     method: "POST",
     body: JSON.stringify({
@@ -105,7 +105,13 @@ function getUserPNo(orgCode, name, birthday) {
     headers: HEADER,
   })
     .then((response) => response.json())
-    .then((json) => json.token)
+    .then((data) => {
+      if (data.isError == true) {
+        throw new Error("User Information Error");
+      } else {
+        return data.token;
+      }
+    })
     .then((token) =>
       fetch("https://goehcs.eduro.go.kr/v2/validatePassword", {
         method: "POST",
@@ -125,7 +131,6 @@ function getUserPNo(orgCode, name, birthday) {
       if (token.startsWith("Bearer")) {
         return token;
       } else {
-        console.log(name, birthday, orgCode, userPNo, password);
         throw new Error("Password Validation Error");
       }
     })
@@ -166,7 +171,7 @@ router.get("/privacy", function (req, res, next) {
 
 router.post("/add", async function (req, res, next) {
   if (await validateUser(req.body.orgCode, req.body.name, req.body.birthday, req.body.password)) {
-    const userPNo = await getUserPNo(req.body.orgCode, req.body.name, req.body.birthday);
+    const userPNo = await getUserPNo(req.body.orgCode, req.body.name, req.body.birthday, req.body.password);
     const students = db.collection("students");
     if (userPNo) {
       students
