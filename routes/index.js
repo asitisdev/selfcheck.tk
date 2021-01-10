@@ -107,6 +107,29 @@ function getUserPNo(orgCode, name, birthday) {
     .then((response) => response.json())
     .then((json) => json.token)
     .then((token) =>
+      fetch("https://goehcs.eduro.go.kr/v2/validatePassword", {
+        method: "POST",
+        body: JSON.stringify({
+          deviceUuid: "",
+          password: encrypt(password),
+        }),
+        headers: {
+          ...HEADER,
+          Authorization: token,
+        },
+      })
+    )
+    .then((response) => response.text())
+    .then((data) => {
+      const token = data.slice(1, -1);
+      if (token.startsWith("Bearer")) {
+        return token;
+      } else {
+        console.log(name, birthday, orgCode, userPNo, password);
+        throw new Error("Password Validation Error");
+      }
+    })
+    .then((token) =>
       fetch("https://goehcs.eduro.go.kr/v2/selectUserGroup", {
         method: "POST",
         body: JSON.stringify({}),
